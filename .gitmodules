@@ -1,0 +1,6 @@
+[submodule "lib/cc3000"]
+	path = lib/cc3000
+	url = git@github.com:jaimeyu/Adafruit_CC3000_Library.git
+[submodule "lib/gratis"]
+	path = lib/gratis
+	url = git@github.com:jaimeyu/gratis.git
