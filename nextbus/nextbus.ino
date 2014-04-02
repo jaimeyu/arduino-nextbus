@@ -84,10 +84,17 @@ EPD_GFX G_EPD(EPD, S5813A);
 
 // Prototype for now.
 void displayHandler(void);
+void displaySetup(void);
+void displayFlashSetup(void);
+void displayTempSensorSetup(void);
 
 // I/O setup
 void setup() {
+  Serial.begin(9600);
+
   displaySetup();
+  displayFlashSetup();
+  displayTempSensorSetup();
 }
 
 
@@ -118,20 +125,32 @@ void displaySetup() {
   digitalWrite(PIN_EPD_CS, LOW);
   digitalWrite(PIN_FLASH_CS, HIGH);
 
-  Serial.begin(9600);
 
   Serial.println();
   Serial.println();
-  Serial.println("Thermo version: " THERMO_VERSION);
   Serial.println("Display: " MAKE_STRING(EPD_SIZE));
   Serial.println();
 
+
+
+
+  // set up graphics EPD library
+  // and clear the screen
+  G_EPD.begin();
+}
+
+
+void displayFlashSetup(void) {
   FLASH.begin(PIN_FLASH_CS);
   if (FLASH.available()) {
     Serial.println("FLASH chip detected OK");
   } else {
     Serial.println("unsupported FLASH chip");
   }
+}
+
+void displayTempSensorSetup(void) {
+  Serial.println("Thermo version: " THERMO_VERSION);
 
   // configure temperature sensor
   S5813A.begin(PIN_TEMPERATURE);
@@ -141,10 +160,6 @@ void displaySetup() {
   Serial.print("Temperature = ");
   Serial.print(temperature);
   Serial.println(" Celcius");
-
-  // set up graphics EPD library
-  // and clear the screen
-  G_EPD.begin();
 }
 
 void displayHandler() {
