@@ -4,3 +4,6 @@
 [submodule "lib/gratis"]
 	path = lib/gratis
 	url = git@github.com:jaimeyu/gratis.git
+[submodule "lib/adaGFX"]
+	path = lib/adaGFX
+	url = git@github.com:jaimeyu/Adafruit-GFX-Library.git
