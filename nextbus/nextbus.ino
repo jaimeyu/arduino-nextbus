@@ -52,18 +52,71 @@
 #define THERMO_VERSION "3"
 
 
+
+
+#ifdef EPD_ORIG_MODE
 // Arduino IO layout
-const int PIN_DISPLAY_TEMPERATURE = A0;
+const int PIN_PANEL_TEMPERATURE = A0;
 const int PIN_PANEL_ON = 2;
-const int PIN_DISPLAY_BORDER = 3;
-const int PIN_DISPLAY_DISCHARGE = 4;
-const int PIN_DISPLAY_PWM = 5;
-const int PIN_DISPLAY_RESET = 6;
-const int PIN_DISPLAY_BUSY = 7;
+const int PIN_PANEL_BORDER = 3;
+const int PIN_PANEL_DISCHARGE = 4;
+const int PIN_PANEL_PWM = 5;
+const int PIN_PANEL_RESET = 6;
+const int PIN_PANEL_BUSY = 7;
 const int PIN_EPD_CS = 8;
 const int PIN_FLASH_CS = 9;
-const int PIN_DISPLAY_SW2 = 12; // <-- TODO: What is this?? Check schem.
+const int PIN_PANEL_SW2 = 12; // <-- TODO: What is this?? Check schem.
 const int PIN_RED_LED = 13;
+
+#else
+typedef enum {
+  SER_RX = 0,
+  SER_TX = 1,
+  PIN_PANEL_ON = 2,
+  PIN_PANEL_BORDER = 3,
+  PIN_PANEL_DISCHARGE = 4,
+  PIN_PANEL_PWM = 5,
+  PIN_PANEL_RESET = 6,
+  PIN_PANEL_BUSY = 7,
+  PIN_EPD_CS = 8,
+  PIN_FLASH_CS = 9,
+  __GPIO_AVAIL_10 = 10,
+  __GPIO_AVAIL_11 = 11,
+  PIN_PANEL_SW2 = 12, // <-- TODO: What is this?? Check schem.
+  PIN_RED_LED = 13,
+  
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+  __GPIO_AVAIL_14 = 14,
+  __GPIO_AVAIL_15 = 15,
+  // TODO: There are a total of 54 GPIOs on the MEGA. 
+#endif
+} DIGITAL_PIN_OUT;
+
+typedef enum {
+  PIN_PANEL_TEMPERATURE = A0,
+  __ANALOG_AVAIL_A1 = A1,
+  __ANALOG_AVAIL_A2 = A2,
+  __ANALOG_AVAIL_A3 = A3,
+  __ANALOG_AVAIL_A4 = A4,
+  __ANALOG_AVAIL_A5 = A5,
+
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+  __ANALOG_AVAIL_A6 = A6,
+  __ANALOG_AVAIL_A7 = A7,
+  __ANALOG_AVAIL_A8 = A8,
+  __ANALOG_AVAIL_A9 = A9,
+  __ANALOG_AVAIL_A10 = A10,
+  __ANALOG_AVAIL_A11 = A11,
+  __ANALOG_AVAIL_A12 = A12,
+  __ANALOG_AVAIL_A13 = A13,
+#endif
+ 
+} ANALOG_PIN_OUT;
+
+#endif
+
+
+
 
 // LED anode through resistor to I/O pin
 // LED cathode to Ground
@@ -77,7 +130,7 @@ const int PIN_RED_LED = 13;
 
 
 // define the E-Ink display
-EPD_Class EPD(EPD_SIZE, PIN_PANEL_ON, PIN_DISPLAY_BORDER, PIN_DISPLAY_DISCHARGE, PIN_DISPLAY_PWM, PIN_DISPLAY_RESET, PIN_DISPLAY_BUSY, PIN_EPD_CS);
+EPD_Class EPD(EPD_SIZE, PIN_PANEL_ON, PIN_PANEL_BORDER, PIN_PANEL_DISCHARGE, PIN_PANEL_PWM, PIN_PANEL_RESET, PIN_PANEL_BUSY, PIN_EPD_CS);
 
 // graphic handler
 EPD_GFX G_EPD(EPD, S5813A);
@@ -105,23 +158,23 @@ void loop() {
 
 void displaySetup() {
   pinMode(PIN_RED_LED, OUTPUT);
-  pinMode(PIN_DISPLAY_SW2, INPUT);
-  pinMode(PIN_DISPLAY_TEMPERATURE, INPUT);
-  pinMode(PIN_DISPLAY_PWM, OUTPUT);
-  pinMode(PIN_DISPLAY_BUSY, INPUT);
-  pinMode(PIN_DISPLAY_RESET, OUTPUT);
+  pinMode(PIN_PANEL_SW2, INPUT);
+  pinMode(PIN_PANEL_TEMPERATURE, INPUT);
+  pinMode(PIN_PANEL_PWM, OUTPUT);
+  pinMode(PIN_PANEL_BUSY, INPUT);
+  pinMode(PIN_PANEL_RESET, OUTPUT);
   pinMode(PIN_PANEL_ON, OUTPUT);
-  pinMode(PIN_DISPLAY_DISCHARGE, OUTPUT);
-  pinMode(PIN_DISPLAY_BORDER, OUTPUT);
+  pinMode(PIN_PANEL_DISCHARGE, OUTPUT);
+  pinMode(PIN_PANEL_BORDER, OUTPUT);
   pinMode(PIN_EPD_CS, OUTPUT);
   pinMode(PIN_FLASH_CS, OUTPUT);
 
   digitalWrite(PIN_RED_LED, LOW);
-  digitalWrite(PIN_DISPLAY_PWM, LOW);
-  digitalWrite(PIN_DISPLAY_RESET, LOW);
+  digitalWrite(PIN_PANEL_PWM, LOW);
+  digitalWrite(PIN_PANEL_RESET, LOW);
   digitalWrite(PIN_PANEL_ON, LOW);
-  digitalWrite(PIN_DISPLAY_DISCHARGE, LOW);
-  digitalWrite(PIN_DISPLAY_BORDER, LOW);
+  digitalWrite(PIN_PANEL_DISCHARGE, LOW);
+  digitalWrite(PIN_PANEL_BORDER, LOW);
   digitalWrite(PIN_EPD_CS, LOW);
   digitalWrite(PIN_FLASH_CS, HIGH);
 
@@ -153,7 +206,7 @@ void displayTempSensorSetup(void) {
   Serial.println("Thermo version: " THERMO_VERSION);
 
   // configure temperature sensor
-  S5813A.begin(PIN_DISPLAY_TEMPERATURE);
+  S5813A.begin(PIN_PANEL_TEMPERATURE);
 
   // get the current temperature
   int temperature = S5813A.read();
