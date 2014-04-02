@@ -36,6 +36,10 @@
 #include <EPD_GFX.h>
 
 
+/**********************************/
+/* DISPLAY DEFINES */
+/**********************************/
+
 // Change this for different display size
 // supported sizes: 1_44 2_0
 // NOTE: change the pixel_width in EPD_GFX.h to match
@@ -52,23 +56,45 @@
 // current version number
 #define THERMO_VERSION "3"
 
+// LED anode through resistor to I/O pin
+// LED cathode to Ground
+#define LED_ON  HIGH
+#define LED_OFF LOW
+
+
+// pre-processor convert to string
+#define MAKE_STRING1(X) #X
+#define MAKE_STRING(X) MAKE_STRING1(X)
+
+/**********************************/
+/* GLOBALS */
+/**********************************/
+
 // Arduino GPIO layout
-const uint8_t PIN_PANEL_ON = 2;
-const uint8_t PIN_PANEL_BORDER = 3;
-const uint8_t PIN_PANEL_DISCHARGE = 4;
-const uint8_t PIN_PANEL_PWM = 5;
-const uint8_t PIN_PANEL_RESET = 6;
-const uint8_t PIN_PANEL_BUSY = 7;
-const uint8_t PIN_EPD_CS = 8;
-const uint8_t PIN_FLASH_CS = 9;
+/** Display SEGMENT **/
+const uint8_t GPIO_PANEL_ON = 2;
+const uint8_t GPIO_PANEL_BORDER = 3;
+const uint8_t GPIO_PANEL_DISCHARGE = 4;
+const uint8_t GPIO_PANEL_PWM = 5;
+const uint8_t GPIO_PANEL_RESET = 6;
+const uint8_t GPIO_PANEL_BUSY = 7;
+const uint8_t GPIO_EPD_CS = 8;
+const uint8_t GPIO_FLASH_CS = 9;
 const uint8_t __GPIO_AVAIL_10 = 10;
 const uint8_t __GPIO_AVAIL_11 = 11;
-const uint8_t PIN_PANEL_SW2 = 12; // <-- TODO: What is this?? Check schem.
-const uint8_t PIN_RED_LED = 13;
-
+const uint8_t GPIO_PANEL_SW2 = 12; // <-- TODO: What is this?? Check schem.
+const uint8_t GPIO_RED_LED = 13;
+/** WIFI SEGMENT **/
+const uint8_t GPIO_CC3000_VBAT = 14;
+const uint8_t GPIO_CC3000_CS = 15;
+const uint8_t __GPIO_AVAIL_16 = 16;
+const uint8_t __GPIO_AVAIL_17 = 17;
+const uint8_t GPIO_CC3000_IRQ = 18; // INTR 5 on MEGA
+const uint8_t __GPIO_AVAIL_19 = 19;
+const uint8_t __GPIO_AVAIL_20 = 20;
 
 // Analog layout
-const uint8_t PIN_PANEL_TEMPERATURE = A0;
+const uint8_t AIO_PANEL_TEMPERATURE = A0;
 const uint8_t __ANALOG_AVAIL_A1 = A1;
 const uint8_t __ANALOG_AVAIL_A2 = A2;
 const uint8_t __ANALOG_AVAIL_A3 = A3;
@@ -86,23 +112,24 @@ const uint8_t __ANALOG_AVAIL_A12 = A12;
 const uint8_t __ANALOG_AVAIL_A13 = A13;
 #endif
 
-
-// LED anode through resistor to I/O pin
-// LED cathode to Ground
-#define LED_ON  HIGH
-#define LED_OFF LOW
-
-
-// pre-processor convert to string
-#define MAKE_STRING1(X) #X
-#define MAKE_STRING(X) MAKE_STRING1(X)
-
-
-// define the E-Ink display
-EPD_Class EPD(EPD_SIZE, PIN_PANEL_ON, PIN_PANEL_BORDER, PIN_PANEL_DISCHARGE, PIN_PANEL_PWM, PIN_PANEL_RESET, PIN_PANEL_BUSY, PIN_EPD_CS);
+/** DISPLAY GLOBALS **/
+EPD_Class EPD(EPD_SIZE, GPIO_PANEL_ON, GPIO_PANEL_BORDER, GPIO_PANEL_DISCHARGE, GPIO_PANEL_PWM, GPIO_PANEL_RESET, GPIO_PANEL_BUSY, GPIO_EPD_CS);
 
 // graphic handler
 EPD_GFX G_EPD(EPD, S5813A);
+
+
+/** WIFI GLOBALS **/
+Adafruit_CC3000 cc3000 = Adafruit_CC3000(GPIO_CC3000_CS, GPIO_CC3000_IRQ, GPIO_CC3000_VBAT,
+                                         SPI_CLOCK_DIVIDER); // you can change this clock speed but DI
+
+#define WLAN_SSID       "myNetwork"        // cannot be longer than 32 characters!
+#define WLAN_PASS       "myPassword"
+// Security can be WLAN_SEC_UNSEC, WLAN_SEC_WEP, WLAN_SEC_WPA or WLAN_SEC_WPA2
+#define WLAN_SECURITY   WLAN_SEC_WPA2
+
+Adafruit_CC3000_Client client;
+
 
 // Prototype for now.
 void displayHandler(void);
@@ -126,26 +153,26 @@ void loop() {
 }
 
 void displaySetup() {
-  pinMode(PIN_RED_LED, OUTPUT);
-  pinMode(PIN_PANEL_SW2, INPUT);
-  pinMode(PIN_PANEL_TEMPERATURE, INPUT);
-  pinMode(PIN_PANEL_PWM, OUTPUT);
-  pinMode(PIN_PANEL_BUSY, INPUT);
-  pinMode(PIN_PANEL_RESET, OUTPUT);
-  pinMode(PIN_PANEL_ON, OUTPUT);
-  pinMode(PIN_PANEL_DISCHARGE, OUTPUT);
-  pinMode(PIN_PANEL_BORDER, OUTPUT);
-  pinMode(PIN_EPD_CS, OUTPUT);
-  pinMode(PIN_FLASH_CS, OUTPUT);
+  pinMode(GPIO_RED_LED, OUTPUT);
+  pinMode(GPIO_PANEL_SW2, INPUT);
+  pinMode(AIO_PANEL_TEMPERATURE, INPUT);
+  pinMode(GPIO_PANEL_PWM, OUTPUT);
+  pinMode(GPIO_PANEL_BUSY, INPUT);
+  pinMode(GPIO_PANEL_RESET, OUTPUT);
+  pinMode(GPIO_PANEL_ON, OUTPUT);
+  pinMode(GPIO_PANEL_DISCHARGE, OUTPUT);
+  pinMode(GPIO_PANEL_BORDER, OUTPUT);
+  pinMode(GPIO_EPD_CS, OUTPUT);
+  pinMode(GPIO_FLASH_CS, OUTPUT);
 
-  digitalWrite(PIN_RED_LED, LOW);
-  digitalWrite(PIN_PANEL_PWM, LOW);
-  digitalWrite(PIN_PANEL_RESET, LOW);
-  digitalWrite(PIN_PANEL_ON, LOW);
-  digitalWrite(PIN_PANEL_DISCHARGE, LOW);
-  digitalWrite(PIN_PANEL_BORDER, LOW);
-  digitalWrite(PIN_EPD_CS, LOW);
-  digitalWrite(PIN_FLASH_CS, HIGH);
+  digitalWrite(GPIO_RED_LED, LOW);
+  digitalWrite(GPIO_PANEL_PWM, LOW);
+  digitalWrite(GPIO_PANEL_RESET, LOW);
+  digitalWrite(GPIO_PANEL_ON, LOW);
+  digitalWrite(GPIO_PANEL_DISCHARGE, LOW);
+  digitalWrite(GPIO_PANEL_BORDER, LOW);
+  digitalWrite(GPIO_EPD_CS, LOW);
+  digitalWrite(GPIO_FLASH_CS, HIGH);
 
 
   Serial.println();
@@ -163,7 +190,7 @@ void displaySetup() {
 
 
 void displayFlashSetup(void) {
-  FLASH.begin(PIN_FLASH_CS);
+  FLASH.begin(GPIO_FLASH_CS);
   if (FLASH.available()) {
     Serial.println("FLASH chip detected OK");
   } else {
@@ -175,7 +202,7 @@ void displayTempSensorSetup(void) {
   Serial.println("Thermo version: " THERMO_VERSION);
 
   // configure temperature sensor
-  S5813A.begin(PIN_PANEL_TEMPERATURE);
+  S5813A.begin(AIO_PANEL_TEMPERATURE);
 
   // get the current temperature
   int temperature = S5813A.read();
@@ -252,9 +279,9 @@ void displayHandler() {
 
   // flash LED for a number of seconds
   for (int x = 0; x < LOOP_DELAY_SECONDS * 10; ++x) {
-    digitalWrite(PIN_RED_LED, LED_ON);
+    digitalWrite(GPIO_RED_LED, LED_ON);
     delay(50);
-    digitalWrite(PIN_RED_LED, LED_OFF);
+    digitalWrite(GPIO_RED_LED, LED_OFF);
     delay(50);
   }
 }
