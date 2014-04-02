@@ -1,4 +1,5 @@
-// Copyright 2013 Pervasive Displays, Inc.
+// Copyright 2014 Jaime Yu
+// jaime@jaimeyu.com
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -51,71 +52,39 @@
 // current version number
 #define THERMO_VERSION "3"
 
+// Arduino GPIO layout
+const uint8_t PIN_PANEL_ON = 2;
+const uint8_t PIN_PANEL_BORDER = 3;
+const uint8_t PIN_PANEL_DISCHARGE = 4;
+const uint8_t PIN_PANEL_PWM = 5;
+const uint8_t PIN_PANEL_RESET = 6;
+const uint8_t PIN_PANEL_BUSY = 7;
+const uint8_t PIN_EPD_CS = 8;
+const uint8_t PIN_FLASH_CS = 9;
+const uint8_t __GPIO_AVAIL_10 = 10;
+const uint8_t __GPIO_AVAIL_11 = 11;
+const uint8_t PIN_PANEL_SW2 = 12; // <-- TODO: What is this?? Check schem.
+const uint8_t PIN_RED_LED = 13;
 
 
-
-#ifdef EPD_ORIG_MODE
-// Arduino IO layout
-const int PIN_PANEL_TEMPERATURE = A0;
-const int PIN_PANEL_ON = 2;
-const int PIN_PANEL_BORDER = 3;
-const int PIN_PANEL_DISCHARGE = 4;
-const int PIN_PANEL_PWM = 5;
-const int PIN_PANEL_RESET = 6;
-const int PIN_PANEL_BUSY = 7;
-const int PIN_EPD_CS = 8;
-const int PIN_FLASH_CS = 9;
-const int PIN_PANEL_SW2 = 12; // <-- TODO: What is this?? Check schem.
-const int PIN_RED_LED = 13;
-
-#else
-typedef enum {
-  SER_RX = 0,
-  SER_TX = 1,
-  PIN_PANEL_ON = 2,
-  PIN_PANEL_BORDER = 3,
-  PIN_PANEL_DISCHARGE = 4,
-  PIN_PANEL_PWM = 5,
-  PIN_PANEL_RESET = 6,
-  PIN_PANEL_BUSY = 7,
-  PIN_EPD_CS = 8,
-  PIN_FLASH_CS = 9,
-  __GPIO_AVAIL_10 = 10,
-  __GPIO_AVAIL_11 = 11,
-  PIN_PANEL_SW2 = 12, // <-- TODO: What is this?? Check schem.
-  PIN_RED_LED = 13,
-  
-#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-  __GPIO_AVAIL_14 = 14,
-  __GPIO_AVAIL_15 = 15,
-  // TODO: There are a total of 54 GPIOs on the MEGA. 
-#endif
-} DIGITAL_PIN_OUT;
-
-typedef enum {
-  PIN_PANEL_TEMPERATURE = A0,
-  __ANALOG_AVAIL_A1 = A1,
-  __ANALOG_AVAIL_A2 = A2,
-  __ANALOG_AVAIL_A3 = A3,
-  __ANALOG_AVAIL_A4 = A4,
-  __ANALOG_AVAIL_A5 = A5,
+// Analog layout
+const uint8_t PIN_PANEL_TEMPERATURE = A0;
+const uint8_t __ANALOG_AVAIL_A1 = A1;
+const uint8_t __ANALOG_AVAIL_A2 = A2;
+const uint8_t __ANALOG_AVAIL_A3 = A3;
+const uint8_t __ANALOG_AVAIL_A4 = A4;
+const uint8_t __ANALOG_AVAIL_A5 = A5;
 
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-  __ANALOG_AVAIL_A6 = A6,
-  __ANALOG_AVAIL_A7 = A7,
-  __ANALOG_AVAIL_A8 = A8,
-  __ANALOG_AVAIL_A9 = A9,
-  __ANALOG_AVAIL_A10 = A10,
-  __ANALOG_AVAIL_A11 = A11,
-  __ANALOG_AVAIL_A12 = A12,
-  __ANALOG_AVAIL_A13 = A13,
+const uint8_t __ANALOG_AVAIL_A6 = A6;
+const uint8_t __ANALOG_AVAIL_A7 = A7;
+const uint8_t __ANALOG_AVAIL_A8 = A8;
+const uint8_t __ANALOG_AVAIL_A9 = A9;
+const uint8_t __ANALOG_AVAIL_A10 = A10;
+const uint8_t __ANALOG_AVAIL_A11 = A11;
+const uint8_t __ANALOG_AVAIL_A12 = A12;
+const uint8_t __ANALOG_AVAIL_A13 = A13;
 #endif
- 
-} ANALOG_PIN_OUT;
-
-#endif
-
-
 
 
 // LED anode through resistor to I/O pin
