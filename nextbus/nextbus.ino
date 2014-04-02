@@ -53,16 +53,16 @@
 
 
 // Arduino IO layout
-const int PIN_TEMPERATURE = A0;
+const int PIN_DISPLAY_TEMPERATURE = A0;
 const int PIN_PANEL_ON = 2;
-const int PIN_BORDER = 3;
-const int PIN_DISCHARGE = 4;
-const int PIN_PWM = 5;
-const int PIN_RESET = 6;
-const int PIN_BUSY = 7;
+const int PIN_DISPLAY_BORDER = 3;
+const int PIN_DISPLAY_DISCHARGE = 4;
+const int PIN_DISPLAY_PWM = 5;
+const int PIN_DISPLAY_RESET = 6;
+const int PIN_DISPLAY_BUSY = 7;
 const int PIN_EPD_CS = 8;
 const int PIN_FLASH_CS = 9;
-const int PIN_SW2 = 12;
+const int PIN_DISPLAY_SW2 = 12; // <-- TODO: What is this?? Check schem.
 const int PIN_RED_LED = 13;
 
 // LED anode through resistor to I/O pin
@@ -77,7 +77,7 @@ const int PIN_RED_LED = 13;
 
 
 // define the E-Ink display
-EPD_Class EPD(EPD_SIZE, PIN_PANEL_ON, PIN_BORDER, PIN_DISCHARGE, PIN_PWM, PIN_RESET, PIN_BUSY, PIN_EPD_CS);
+EPD_Class EPD(EPD_SIZE, PIN_PANEL_ON, PIN_DISPLAY_BORDER, PIN_DISPLAY_DISCHARGE, PIN_DISPLAY_PWM, PIN_DISPLAY_RESET, PIN_DISPLAY_BUSY, PIN_EPD_CS);
 
 // graphic handler
 EPD_GFX G_EPD(EPD, S5813A);
@@ -105,23 +105,23 @@ void loop() {
 
 void displaySetup() {
   pinMode(PIN_RED_LED, OUTPUT);
-  pinMode(PIN_SW2, INPUT);
-  pinMode(PIN_TEMPERATURE, INPUT);
-  pinMode(PIN_PWM, OUTPUT);
-  pinMode(PIN_BUSY, INPUT);
-  pinMode(PIN_RESET, OUTPUT);
+  pinMode(PIN_DISPLAY_SW2, INPUT);
+  pinMode(PIN_DISPLAY_TEMPERATURE, INPUT);
+  pinMode(PIN_DISPLAY_PWM, OUTPUT);
+  pinMode(PIN_DISPLAY_BUSY, INPUT);
+  pinMode(PIN_DISPLAY_RESET, OUTPUT);
   pinMode(PIN_PANEL_ON, OUTPUT);
-  pinMode(PIN_DISCHARGE, OUTPUT);
-  pinMode(PIN_BORDER, OUTPUT);
+  pinMode(PIN_DISPLAY_DISCHARGE, OUTPUT);
+  pinMode(PIN_DISPLAY_BORDER, OUTPUT);
   pinMode(PIN_EPD_CS, OUTPUT);
   pinMode(PIN_FLASH_CS, OUTPUT);
 
   digitalWrite(PIN_RED_LED, LOW);
-  digitalWrite(PIN_PWM, LOW);
-  digitalWrite(PIN_RESET, LOW);
+  digitalWrite(PIN_DISPLAY_PWM, LOW);
+  digitalWrite(PIN_DISPLAY_RESET, LOW);
   digitalWrite(PIN_PANEL_ON, LOW);
-  digitalWrite(PIN_DISCHARGE, LOW);
-  digitalWrite(PIN_BORDER, LOW);
+  digitalWrite(PIN_DISPLAY_DISCHARGE, LOW);
+  digitalWrite(PIN_DISPLAY_BORDER, LOW);
   digitalWrite(PIN_EPD_CS, LOW);
   digitalWrite(PIN_FLASH_CS, HIGH);
 
@@ -153,7 +153,7 @@ void displayTempSensorSetup(void) {
   Serial.println("Thermo version: " THERMO_VERSION);
 
   // configure temperature sensor
-  S5813A.begin(PIN_TEMPERATURE);
+  S5813A.begin(PIN_DISPLAY_TEMPERATURE);
 
   // get the current temperature
   int temperature = S5813A.read();
