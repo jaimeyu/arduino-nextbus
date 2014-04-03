@@ -86,12 +86,16 @@ const uint8_t GPIO_PANEL_SW2 = 12; // <-- TODO: What is this?? Check schem.
 const uint8_t GPIO_RED_LED = 13;
 /** WIFI SEGMENT **/
 const uint8_t GPIO_CC3000_VBAT = 14;
-const uint8_t GPIO_CC3000_CS = 15;
+const uint8_t __GPIO_AVAIL_15 = 15;
 const uint8_t __GPIO_AVAIL_16 = 16;
 const uint8_t __GPIO_AVAIL_17 = 17;
 const uint8_t GPIO_CC3000_IRQ = 18; // INTR 5 on MEGA
 const uint8_t __GPIO_AVAIL_19 = 19;
 const uint8_t __GPIO_AVAIL_20 = 20;
+
+const uint8_t GPIO_SD_CS = 35;
+const uint8_t GPIO_CC3000_WEN = 36;
+const uint8_t GPIO_CC3000_CS = 37;
 
 // Analog layout
 const uint8_t AIO_PANEL_TEMPERATURE = A0;
